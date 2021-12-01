@@ -1,8 +1,6 @@
 /index
 db.sqlite3
 
-__pycache__
-
 main.py
 
 recetas_url.txt
