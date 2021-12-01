@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search results: {{request.GET.query}}</title>
+</head>
+<body>
+    <h1>Search results: {{request.GET.query}}</h1>
+    {% for recipe in recipes %}
+    <div>
+        <a href="{% url 'get_by_href' url=recipe.href %}"><img src="{{recipe.image}}" width="150"></img></a>
+        <h2>{{recipe.title}}</h2>
+    </div>
+    {% endfor %}
+</body>
+</html>
