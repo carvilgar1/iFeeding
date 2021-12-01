@@ -2,8 +2,6 @@
 db.sqlite3
 
 __pycache__
-app/migrations
-recipes/migrations
 
 main.py
 
