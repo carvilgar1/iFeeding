@@ -1,18 +1,18 @@
 import os
 
-import re
+import time
+
+from bs4 import BeautifulSoup
 
 import urllib.request
 import http.client
-import time
-from bs4 import BeautifulSoup
+
+import re
 
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
 
 IX_PATH = './indice/'
-
-IX = open_dir(IX_PATH)
 
 SCHEMA = Schema(
             href = ID(stored=True, unique=True),
@@ -24,33 +24,37 @@ SCHEMA = Schema(
             nutrition=KEYWORD(stored=True, commas=True),
         )
 
-
-def create_index(path:str = IX_PATH):
-    if not os.path.exists(path):
-        os.mkdir(path)
-        index = create_in(path, SCHEMA)
-    return index
+if not os.path.exists(IX_PATH):
+    os.mkdir(IX_PATH)
+    IX = create_in(IX_PATH, SCHEMA)
+else:
+    IX = open_dir(IX_PATH)
 
 def init_index():
-    """
-    Crawl data from www.allrecipes.com. In order to perform it the function will sear
-    recipe urls from the web sitemap.xml
-    """
-    patron = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/1/sitemap.xml') #TODO
+    '''
+    This function scrapes data from www.allrecipes.com and insert them into whoosh engine.
+    '''
+    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/1/sitemap.xml') 
 
     sitemap_web = urllib.request.urlopen(url='https://www.allrecipes.com/sitemap.xml').read()
     sitemap_soup = BeautifulSoup(sitemap_web, 'lxml')
     start = time.time()
     i = 0
     with IX.writer() as w:
+        '''
+        First, function crawls URLs from sitemap.xml.
+        Second, It accesses to localizations that match the pattern and crawls recipe links.
+        Finally, It scrapes the recipe information, It formats the data into a right format and
+        stores them.
+        '''
         for loc in sitemap_soup.find_all('loc'):
-            if not patron.match(loc.text):
+            if not pattern.match(loc.text):
                 continue
             sitemap_recipe_web = urllib.request.urlopen(url=loc.text).read()
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 100: #<---
+                if i == 50: #<--- break
                     break
                 url = recipe.text
                 try:
@@ -64,7 +68,7 @@ def init_index():
                 try:
                     image = soup.find('div', class_='image-container').find('div').get('data-src')
                 except:
-                    image = '/static/no_image_available.jpg'
+                    image = '/static/images/no_image_available.jpg'
                 
                 ingredients = soup.find_all('span', {'class' : 'ingredients-item-name'})
                 ingredients_list = '\n'.join([str(x.string).strip() for x in ingredients])
@@ -78,17 +82,21 @@ def init_index():
                 load_time = time.time()
                 m, s = divmod(int(load_time - start), 60)
                 h, m = divmod(m, 60)
-                print(f'Loading data... {i}/{total_data}| Load time: {h:d}h:{m:02d}m:{s:02d}s.', end='\r')
+                animation = '.' * (i%4)
+                print(f'Loading data{animation:3s} {i}/{total_data}| Load time: {h:d}h:{m:02d}m:{s:02d}s.', end='\r')
                 i = i+1
     finish_time = time.time()
     m, s = divmod(int(finish_time - start), 60)
     h, m = divmod(m, 60)
+    os.system('clear')
     print(f'{i} recipes has been loaded in {h:d}h:{m:02d}m:{s:02d}s.')
 
 def main():
-    global IX
-    IX = create_index()
-    init_index()
+    option = input("This process will delete and rewrite the index. Do you want to continue? Y/n ")
+    if option == 'Y':
+        global IX
+        IX = create_in(IX_PATH, SCHEMA)
+        init_index()
     
 
 if __name__ == '__main__':
