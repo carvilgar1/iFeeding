@@ -34,7 +34,7 @@ def init_index():
     '''
     This function scrapes data from www.allrecipes.com and insert them into whoosh engine.
     '''
-    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/1/sitemap.xml') 
+    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/[\d]+/sitemap.xml') 
 
     sitemap_web = urllib.request.urlopen(url='https://www.allrecipes.com/sitemap.xml').read()
     sitemap_soup = BeautifulSoup(sitemap_web, 'lxml')
@@ -54,7 +54,7 @@ def init_index():
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 50: #<--- break
+                if i == 300: #<--
                     break
                 url = recipe.text
                 try:
@@ -79,6 +79,7 @@ def init_index():
                 nutrition = soup.find('div', {'class' : 'partial recipe-nutrition-section'}).find('div', {'class' : 'section-body'}).text.replace('. Full Nutrition','').replace('; ',',').strip()
                 
                 w.add_document(href=url, image=image, title = title, summary=summary, ingredients = ingredients_list, directions=directions_list, nutrition=nutrition)
+                #Animation stuff while scraping
                 load_time = time.time()
                 m, s = divmod(int(load_time - start), 60)
                 h, m = divmod(m, 60)

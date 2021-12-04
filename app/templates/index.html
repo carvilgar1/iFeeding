@@ -10,6 +10,17 @@
     <form action="{% url 'search_by_title_or_summary' %}" method="get">
         <label for="your_name">Your query here: </label>
         <input id="query" type="text" name="query">
+        <input id="page_num" type="hidden" name="page_num" value="1">
+        <input id="page_len" type="hidden" name="page_len" value="15">
+    </form>
+    <form action="{% url 'search_by_ingredients' %}" method="post">
+        {% csrf_token %}
+        <label for="your_name">Your ingredients here: </label>
+        <input id="ingredients" type="text" name="ingredients">
+
+        <label for="your_name">Your ingredients to exclude here: </label>
+        <input id="ingredients_to_exclude" type="text" name="ingredients_to_exclude">
+        <input type="submit" value="OK">
     </form>
     Aqui una pagina de bienvenida
 </body>

@@ -6,14 +6,34 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search results: {{request.GET.query}}</title>
+
+    <link rel="stylesheet" href="{% static 'styles/search.css' %}">
 </head>
 <body>
     <h1>Search results: {{request.GET.query}}</h1>
-    {% for recipe in recipes %}
-    <div>
-        <a href="{% url 'get_by_href' url=recipe.href %}"><img src="{{recipe.image}}" width="150"></img></a>
-        <h2>{{recipe.title}}</h2>
+    <h2><span id="result_len">{{result_len}}</span> has been found</h2>
+    <form action="{% url 'search_by_title_or_summary' %}" method="get">
+        <label for="your_name">Your query here: </label>
+        <input id="query" type="text" name="query" value={{request.GET.query}}>
+        <input id="page_num" type="number" name="page_num" value="{{request.GET.page_num}}">
+        <input id="page_len" type="number" name="page_len" min=15 max=30 value="{{request.GET.page_len}}">
+        <input type="submit" value="Submit">
+        {% if errors%}
+            {% for error in errors%}
+            <div>
+                <p>{{error}}</p>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </form>
+    <script type="text/javascript" src="{% static "js/pagination.js" %}"></script>
+    <div class="container">
+        {% for recipe in recipes %}
+        <div>
+            <a href="{% url 'get_by_href' url=recipe.href %}"><img src="{{recipe.image}}" width="150"></img></a>
+            <h2>{{recipe.title}}</h2>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </body>
 </html>
