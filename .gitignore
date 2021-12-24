@@ -1,7 +1,7 @@
-/index
+migrations
 db.sqlite3
 
-/__pycache__
+__pycache__
 main.py
 
 recetas_url.txt

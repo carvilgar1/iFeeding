@@ -1,0 +1,13 @@
+<header>
+  <nav class="navbar navbar-light bg-light justify-content-between">
+    <a class="navbar-brand" href="{% url 'welcome' %}">iFeeding</a>
+    <form class="form-inline" action="{% url 'recipe_search' %}" method="GET">
+      <input class="form-control mr-sm-2" id="query" name="query" type="search" placeholder="Search" value="{{request.GET.query}}" aria-label="Search">
+      <input id="page_num" type="hidden" name="page_num" value="1">
+      <input id="page_len" type="hidden" name="page_len" value="15">
+      <input id="ingredients_to_include" type="hidden" name="ingredients_to_include" value="">
+      <input id="ingredients_to_exclude" type="hidden" name="ingredients_to_exclude" value="">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+  </nav>
+</header>

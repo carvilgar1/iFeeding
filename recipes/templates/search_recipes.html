@@ -1,22 +1,20 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search results: {{request.GET.query}}</title>
+{% extends "index.html" %}
 
+{% load static %}
+{% block  content %}
     <link rel="stylesheet" href="{% static 'styles/search.css' %}">
-</head>
-<body>
     <h1>Search results: {{request.GET.query}}</h1>
     <h2><span id="result_len">{{result_len}}</span> has been found</h2>
-    <form action="{% url 'search_by_title_or_summary' %}" method="get">
-        <label for="your_name">Your query here: </label>
-        <input id="query" type="text" name="query" value={{request.GET.query}}>
-        <input id="page_num" type="number" name="page_num" value="{{request.GET.page_num}}">
-        <input id="page_len" type="number" name="page_len" min=15 max=30 value="{{request.GET.page_len}}">
+    <form action="{% url 'recipe_search' %}" method="get">
+        <input id="query" type="hidden" name="query" value="{{request.GET.query}}">
+        <label for="your_name">Your ingredients here: </label>
+        <input id="ingredients_to_include" type="text" name="ingredients_to_include" value="{{request.GET.ingredients_to_include}}"><br>
+
+        <label for="your_name">Your ingredients to exclude here: </label>
+        <input id="ingredients_to_exclude" type="text" name="ingredients_to_exclude" value="{{request.GET.ingredients_to_exclude}}"><br>
+
+        <input id="page_num" type="number" name="page_num" value="{{request.GET.page_num}}"><br>
+        <input id="page_len" type="number" name="page_len" min="15" max="30" step="5" value="{{request.GET.page_len}}">
         <input type="submit" value="Submit">
         {% if errors%}
             {% for error in errors%}
@@ -35,5 +33,4 @@
         </div>
         {% endfor %}
     </div>
-</body>
-</html>
+{% endblock %}

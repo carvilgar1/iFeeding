@@ -1,11 +1,14 @@
 from django.shortcuts import render
+from whoosh.query.compound import Or
 
 from whoosh.query.terms import Term
 from whoosh_controller import SCHEMA, IX
 from whoosh.qparser import MultifieldParser, QueryParser
 
+from .forms import extended_search_form
+
 # Create your views here.
-def search_by_title_or_summary(request):
+def recipe_search(request):
     context = dict()
     pagenum=int(request.GET['page_num'])
     pagelen=int(request.GET['page_len'])
@@ -16,12 +19,26 @@ def search_by_title_or_summary(request):
     with IX.searcher() as s:
         parser = MultifieldParser(['summary', 'title'], SCHEMA)
         my_query = parser.parse(request.GET['query'])
-        results = s.search_page(my_query, pagenum=pagenum, pagelen=pagelen)
+        #If ingredients_to_include or ingredients_to_exclude are settled but empty then set their values to None to not filter the results
+        ingredients_to_include = Or([Term('ingredients', request.GET['ingredients_to_include'])]) if request.GET['ingredients_to_include'] else None
+        ingredients_to_exclude = Or([Term('ingredients', request.GET['ingredients_to_exclude'])]) if request.GET['ingredients_to_exclude'] else None
+        results = s.search_page(my_query, filter=ingredients_to_include, mask=ingredients_to_exclude, pagenum=pagenum, pagelen=pagelen)
         context['recipes'] = results
         context['result_len'] = len(results)
         html = render(request, 'search_recipes.html', context)
     return html
-        
+
+def extended_search(request):
+    context = dict()
+    with IX.searcher() as s:
+        parser = MultifieldParser(['summary', 'title'], SCHEMA)
+        my_query = parser.parse(request.POST['ingredients'])
+        ingredients_to_exclude = Or([Term('ingredients', request.POST['ingredients_to_exclude'])])
+        results = s.search_page(my_query, mask=ingredients_to_exclude, pagenum=1, pagelen=15)
+        context['recipes'] = results
+        context['result_len'] = len(results)
+        html = render(request, 'search_recipes.html', context)
+    return html
 
 def get_by_href(request, url):
     with IX.searcher() as s:
@@ -30,16 +47,4 @@ def get_by_href(request, url):
         context = dict(recipe)
 
         html = render(request, 'recipe_info.html', context)
-    return html
-
-def search_by_ingredients(request):
-    #TODO: Pagination implementation
-    context = dict()
-    with IX.searcher() as s:
-        parser = QueryParser('ingredients', SCHEMA)
-        my_query = parser.parse(request.POST['ingredients'])
-        ingredients_to_exclude = Term('ingredients', request.POST['ingredients'])
-        context['recipes'] = s.search(my_query, mask=ingredients_to_exclude)
-
-        html = render(request, 'search_recipes.html', context)
     return html
