@@ -3,7 +3,3 @@ db.sqlite3
 
 __pycache__
 main.py
-
-recetas_url.txt
-recetas_url copy.txt
-plugins.txt
