@@ -21,5 +21,6 @@ import app.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', app.views.welcome, name='welcome'),
+    path('populate/', app.views.populate, name='populate'),
     path('recipes/', include('recipes.urls')),
 ]

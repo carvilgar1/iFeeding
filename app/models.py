@@ -8,6 +8,10 @@ class Tag(models.Model):
 
 class Receta(models.Model):
     url = models.URLField(max_length=300, primary_key=True)
+    calorias = models.DecimalField(decimal_places=2, max_digits=5, default=0)
+    proteinas = models.DecimalField(decimal_places=2, max_digits=5, default=0)
+    grasas = models.DecimalField(decimal_places=2, max_digits=5, default=0)
+    carbohidratos = models.DecimalField(decimal_places=2, max_digits=5, default=0)
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
     puntuaciones = models.ManyToManyField(User,through='app.Puntuacion')
 

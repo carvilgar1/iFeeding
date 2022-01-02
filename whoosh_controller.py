@@ -8,9 +8,13 @@ import urllib.request
 import http.client
 
 import re
+from bs4.element import Tag
 
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
+
+from django.contrib.auth.models import User
+from app.models import Tag, Receta, Puntuacion
 
 IX_PATH = './indice/'
 
@@ -19,6 +23,7 @@ SCHEMA = Schema(
             image = ID(stored=True),
             title = TEXT(stored = True),
             summary=TEXT(stored=True),
+            category=KEYWORD(stored=True, commas=True),
             ingredients=TEXT(stored=True),
             directions=TEXT(stored=True),
             nutrition=KEYWORD(stored=True, commas=True),
@@ -54,7 +59,7 @@ def init_index():
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 300: #<--
+                if i == 50: #<--
                     break
                 url = recipe.text
                 try:
@@ -65,6 +70,9 @@ def init_index():
 
                 title = str(soup.find('h1', {'class' : ['headline', 'heading-content', 'elementFont__display']}).string)
                 summary = str(soup.find('div', {'class' : "recipe-summary"}).p.string)
+                category = str(soup.find_all('span', {'class' : "breadcrumbs__title"})[-1].string)
+                valoraciones = soup.find_all('div', {'class' : "component ugc-review ugc-item recipe-review-wrapper"})
+                
                 try:
                     image = soup.find('div', class_='image-container').find('div').get('data-src')
                 except:
@@ -78,7 +86,28 @@ def init_index():
                 
                 nutrition = soup.find('div', {'class' : 'partial recipe-nutrition-section'}).find('div', {'class' : 'section-body'}).text.replace('. Full Nutrition','').replace('; ',',').strip()
                 
-                w.add_document(href=url, image=image, title = title, summary=summary, ingredients = ingredients_list, directions=directions_list, nutrition=nutrition)
+                w.add_document(href=url, image=image, title = title, category=category, summary=summary, ingredients = ingredients_list, directions=directions_list, nutrition=nutrition)
+                
+                #Insert review's data into django database
+                tag = Tag.objects.get_or_create(nombre = category)
+                energy = re.findall(r'(\d+(?:\.\d+)?)', nutrition)
+                calorias=round(float(energy[0]), 2)
+                proteinas=round(float(energy[1]), 2)
+                carbohidratos=round(float(energy[2]), 2)
+                grasas=round(float(energy[3]), 2)
+                receta = Receta.objects.create(url=url, tag=tag[0], calorias=calorias, proteinas=proteinas, carbohidratos=carbohidratos, grasas=grasas)
+                
+               
+                for valoracion in valoraciones:
+                    user = str(valoracion.find('span', {'class' : "reviewer-name"}).string)
+                    rating = str(valoracion.find('span', {'class' : "review-star-text"}).string)
+                    nota = int(re.search(r"[0-5]", rating).group())
+                    usuario, created = User.objects.get_or_create(username=user, password='S3cr3tP4$$w0rd')
+                    '''if created:
+                        usuario.set_password('S3cr3tP4$$w0rd')
+                        usuario.save()'''
+                    Puntuacion.objects.create(receta=receta, usuario=usuario, nota=nota)
+                
                 #Animation stuff while scraping
                 load_time = time.time()
                 m, s = divmod(int(load_time - start), 60)

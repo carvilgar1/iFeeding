@@ -7,10 +7,15 @@ from .models import Tag, Receta, Puntuacion
 class ModelTest(TestCase):
 
     def setUp(self):
-        Tag.objects.create(nombre='Italiana')
-        Receta.objects.create(url='https://www.google.es/', tag=Tag.objects.get(pk='Italiana'))
-        User.objects.create(username='testcase')
-        Puntuacion.objects.create(receta=Receta.objects.get(pk='https://www.google.es/'), usuario=User.objects.get(username='testcase'), nota=5)
+        category = 'Italiana'
+        url = 'https://www.google.es/'
+        usuario = 'testcase'
+        password = 'S3cr3tP4ssW0rD'
+        nota = 5
+        tag = Tag.objects.get_or_create(nombre = category)
+        receta = Receta.objects.create(url=url, tag=tag[0])
+        usuario = User.objects.get_or_create(username=usuario, password=password)
+        Puntuacion.objects.create(receta=receta, usuario=usuario[0], nota=nota)
     
     def test_modelo_instanciado(self):
         self.assertEqual(Tag.objects.count(), 1)
