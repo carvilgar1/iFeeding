@@ -1,0 +1,14 @@
+{% extends 'master.html' %}
+
+{% load static %}
+{% block  content %}
+    <div class="container">
+        {% for rating in ratings %}
+        <div>
+            <a href="{% url 'get_by_href' url=rating.receta.url %}">See recipe</a>
+            <h2>{{rating.receta.tag}}</h2>
+            <h2>{{rating.nota}}</h2>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

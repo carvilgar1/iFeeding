@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 
 import urllib.request
 import http.client
+from urllib.error import HTTPError
 
 import re
 from bs4.element import Tag
@@ -39,12 +40,12 @@ def init_index():
     '''
     This function scrapes data from www.allrecipes.com and insert them into whoosh engine.
     '''
-    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/[\d]+/sitemap.xml') 
+    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/1/sitemap.xml') 
 
     sitemap_web = urllib.request.urlopen(url='https://www.allrecipes.com/sitemap.xml').read()
     sitemap_soup = BeautifulSoup(sitemap_web, 'lxml')
     start = time.time()
-    i = 0
+    i = 1
     with IX.writer() as w:
         '''
         First, function crawls URLs from sitemap.xml.
@@ -59,55 +60,65 @@ def init_index():
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 50: #<--
+                if i == 5000:
                     break
                 url = recipe.text
                 try:
-                    recipe_web = urllib.request.urlopen(url).read()
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    recipe_web = urllib.request.urlopen(req).read()
                 except (http.client.IncompleteRead) as e:
                     recipe_web = e.partial
+                except HTTPError:
+                    pass
                 soup = BeautifulSoup(recipe_web, 'lxml')
 
-                title = str(soup.find('h1', {'class' : ['headline', 'heading-content', 'elementFont__display']}).string)
-                summary = str(soup.find('div', {'class' : "recipe-summary"}).p.string)
-                category = str(soup.find_all('span', {'class' : "breadcrumbs__title"})[-1].string)
-                valoraciones = soup.find_all('div', {'class' : "component ugc-review ugc-item recipe-review-wrapper"})
-                
                 try:
-                    image = soup.find('div', class_='image-container').find('div').get('data-src')
+                    title = str(soup.find('h1', {'class' : ['headline', 'heading-content', 'elementFont__display']}).string)
+                    summary = str(soup.find('div', {'class' : "recipe-summary"}).p.string)
+                    category = str(soup.find_all('span', {'class' : "breadcrumbs__title"})[-1].string)
+                    valoraciones = soup.find_all('div', {'class' : "component ugc-review ugc-item recipe-review-wrapper"})
+                    
+                    try:
+                        image = soup.find('div', class_='image-container').find('div').get('data-src')
+                    except:
+                        image = '/static/images/no_image_available.jpg'
+                    
+                    ingredients = soup.find_all('span', {'class' : 'ingredients-item-name'})
+                    ingredients_list = '\n'.join([str(x.string).strip() for x in ingredients])
+                    
+                    directions = soup.find_all('li', {'class' : 'subcontainer instructions-section-item'})
+                    directions_list = '\n\n'.join([f"{x.find('span', {'class':'checkbox-list-text'}).string}\n{x.p.string}" for x in directions])
+                    
+                    nutrition = soup.find('div', {'class' : 'partial recipe-nutrition-section'}).find('div', {'class' : 'section-body'}).text.replace('. Full Nutrition','').replace('; ',',').strip()
+                    
+                    w.add_document(href=url, image=image, title = title, category=category, summary=summary, ingredients = ingredients_list, directions=directions_list, nutrition=nutrition)
+                    
+                    #Insert review's data into django database
+                    tag = Tag.objects.get_or_create(nombre = category)
+                    energy = re.findall(r'(\d+(?:\.\d+)?)', nutrition)
+                    calorias=round(float(energy[0]), 2)
+                    proteinas=round(float(energy[1]), 2)
+                    carbohidratos=round(float(energy[2]), 2)
+                    grasas=round(float(energy[3]), 2)
+                    print(url, tag, calorias, proteinas, carbohidratos, grasas, len(valoraciones))
+                    receta = Receta.objects.create(url=url, tag=tag[0], calorias=calorias, proteinas=proteinas, carbohidratos=carbohidratos, grasas=grasas)
+                    
+                
+                    for valoracion in valoraciones:
+                        try:
+                            user = str(valoracion.find('span', {'class' : "reviewer-name"}).string)
+                            rating = str(valoracion.find('span', {'class' : "review-star-text"}).string)
+                            nota = int(re.search(r"[0-5]", rating).group())
+                            usuario, created = User.objects.get_or_create(username=user, password='S3cr3tP4$$w0rd')
+                            '''if created:
+                                usuario.set_password('S3cr3tP4$$w0rd')
+                                usuario.save()'''
+                            Puntuacion.objects.create(receta=receta, usuario=usuario, nota=nota)
+                        except:
+                            #recipes with no ratings will raise a execption just skip it.
+                            pass
                 except:
-                    image = '/static/images/no_image_available.jpg'
-                
-                ingredients = soup.find_all('span', {'class' : 'ingredients-item-name'})
-                ingredients_list = '\n'.join([str(x.string).strip() for x in ingredients])
-                
-                directions = soup.find_all('li', {'class' : 'subcontainer instructions-section-item'})
-                directions_list = '\n\n'.join([f"{x.find('span', {'class':'checkbox-list-text'}).string}\n{x.p.string}" for x in directions])
-                
-                nutrition = soup.find('div', {'class' : 'partial recipe-nutrition-section'}).find('div', {'class' : 'section-body'}).text.replace('. Full Nutrition','').replace('; ',',').strip()
-                
-                w.add_document(href=url, image=image, title = title, category=category, summary=summary, ingredients = ingredients_list, directions=directions_list, nutrition=nutrition)
-                
-                #Insert review's data into django database
-                tag = Tag.objects.get_or_create(nombre = category)
-                energy = re.findall(r'(\d+(?:\.\d+)?)', nutrition)
-                calorias=round(float(energy[0]), 2)
-                proteinas=round(float(energy[1]), 2)
-                carbohidratos=round(float(energy[2]), 2)
-                grasas=round(float(energy[3]), 2)
-                receta = Receta.objects.create(url=url, tag=tag[0], calorias=calorias, proteinas=proteinas, carbohidratos=carbohidratos, grasas=grasas)
-                
-               
-                for valoracion in valoraciones:
-                    user = str(valoracion.find('span', {'class' : "reviewer-name"}).string)
-                    rating = str(valoracion.find('span', {'class' : "review-star-text"}).string)
-                    nota = int(re.search(r"[0-5]", rating).group())
-                    usuario, created = User.objects.get_or_create(username=user, password='S3cr3tP4$$w0rd')
-                    '''if created:
-                        usuario.set_password('S3cr3tP4$$w0rd')
-                        usuario.save()'''
-                    Puntuacion.objects.create(receta=receta, usuario=usuario, nota=nota)
-                
+                    pass
                 #Animation stuff while scraping
                 load_time = time.time()
                 m, s = divmod(int(load_time - start), 60)

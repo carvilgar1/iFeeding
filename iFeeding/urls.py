@@ -21,6 +21,7 @@ import app.views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', app.views.welcome, name='welcome'),
-    path('populate/', app.views.populate, name='populate'),
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register/', app.views.register, name='register'),
     path('recipes/', include('recipes.urls')),
 ]

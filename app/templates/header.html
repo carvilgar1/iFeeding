@@ -1,14 +1,44 @@
 <header>
-  <nav class="navbar navbar-light bg-light justify-content-between">
-    <a class="navbar-brand" href="{% url 'welcome' %}">iFeeding</a>
-    <a class="navbar-brand" href="{% url 'populate' %}">populate</a>
-    <form class="form-inline" action="{% url 'recipe_search' %}" method="GET">
-      <input class="form-control mr-sm-2" id="query" name="query" type="search" placeholder="Search" value="{{request.GET.query}}" aria-label="Search">
-      <input id="page_num" type="hidden" name="page_num" value="1">
-      <input id="page_len" type="hidden" name="page_len" value="15">
-      <input id="ingredients_to_include" type="hidden" name="ingredients_to_include" value="">
-      <input id="ingredients_to_exclude" type="hidden" name="ingredients_to_exclude" value="">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand">iFeeding</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'welcome' %}">Home <span class="sr-only">(current)</span></a>
+        </li>
+        {% if  user.is_authenticated %}
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'my_ratings' %}">My Ratings <span class="sr-only">(current)</span></a>
+        </li>
+        {% endif %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            User {% if  user.is_authenticated %}{{user}}{% endif %}
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% if user.is_authenticated  %}
+            <a class="dropdown-item" href="#">Profile</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="{% url 'logout' %}">Log Out</a>
+            {% else %}
+            <a class="dropdown-item" href="{% url 'login' %}">Sing Up</a>
+            <a class="dropdown-item" href="{% url 'register' %}">Sing In</a>
+            {% endif %}
+          </div>
+        </li>
+      </ul>
+      <form class="form-inline" action="{% url 'recipe_search' %}" method="GET">
+        <input class="form-control mr-sm-2" id="query" name="query" type="search" placeholder="Search" value="{{request.GET.query}}" aria-label="Search">
+        <input id="page_num" type="hidden" name="page_num" value="1">
+        <input id="page_len" type="hidden" name="page_len" value="15">
+        <input id="ingredients_to_include" type="hidden" name="ingredients_to_include" value="">
+        <input id="ingredients_to_exclude" type="hidden" name="ingredients_to_exclude" value="">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+    </div>
   </nav>
 </header>

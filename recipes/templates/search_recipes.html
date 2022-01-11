@@ -1,4 +1,4 @@
-{% extends "index.html" %}
+{% extends 'master.html' %}
 
 {% load static %}
 {% block  content %}
@@ -13,6 +13,14 @@
         <label for="your_name">Your ingredients to exclude here: </label>
         <input id="ingredients_to_exclude" type="text" name="ingredients_to_exclude" value="{{request.GET.ingredients_to_exclude}}"><br>
 
+        <label for="tag">tag</label>
+        <select id="tag" name="tag">
+            <option value="">---</option>
+            {% for tag in tags%}
+                <option value="{{tag}}" {% ifequal request.GET.tag tag.nombre %} selected {% endifequal %}>{{tag}}</option>
+            {% endfor %}
+        </select>
+        <br>
         <input id="page_num" type="number" name="page_num" value="{{request.GET.page_num}}"><br>
         <input id="page_len" type="number" name="page_len" min="15" max="30" step="5" value="{{request.GET.page_len}}">
         <input type="submit" value="Submit">

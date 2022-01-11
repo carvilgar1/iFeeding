@@ -6,6 +6,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class Tag(models.Model):
     nombre = models.CharField(max_length=50, primary_key=True)
 
+    def __str__(self) -> str:
+        return self.nombre
+
 class Receta(models.Model):
     url = models.URLField(max_length=300, primary_key=True)
     calorias = models.DecimalField(decimal_places=2, max_digits=5, default=0)
@@ -14,6 +17,9 @@ class Receta(models.Model):
     carbohidratos = models.DecimalField(decimal_places=2, max_digits=5, default=0)
     tag = models.ForeignKey(Tag, on_delete=models.SET_NULL, null=True)
     puntuaciones = models.ManyToManyField(User,through='app.Puntuacion')
+
+    def __str__(self) -> str:
+        return self.url
 
 class Puntuacion(models.Model):
     usuario = models.ForeignKey(User, on_delete=models.CASCADE)
