@@ -6,7 +6,7 @@ from whoosh.query.terms import Term
 from whoosh_controller import SCHEMA, IX
 from whoosh.qparser import MultifieldParser, QueryParser
 
-from .models import Tag, Puntuacion
+from .models import Tag
 
 TAG_LIST = Tag.objects.all()
 
@@ -46,6 +46,5 @@ def get_by_href(request, url):
     return html
 
 def my_ratings(request):
-    ratings = Puntuacion.objects.filter(usuario__id=request.user.id)
-    print(ratings)
+    ratings = request.user.puntuacion_set().all()
     return render(request, 'ratings.html', {'ratings':ratings})
