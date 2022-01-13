@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from django.shortcuts import render
 from whoosh.query.compound import Or, And
 
@@ -45,6 +44,3 @@ def get_by_href(request, url):
         html = render(request, 'recipe_info.html', context)
     return html
 
-def my_ratings(request):
-    ratings = request.user.puntuacion_set().all()
-    return render(request, 'ratings.html', {'ratings':ratings})

@@ -18,6 +18,15 @@
         <h2>{{directions}}</h2>
         <h2>{{nutrition}}</h2>
         <a href="{{href}}">See on original page</a>
+        <form method="GET" action="{% url 'add_recipe_to_daily_plan' %}">
+            <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
+            <input type="submit" value="Add it to your daily plan!">
+        </form><br>
+        <form method="GET" action="{% url 'add_rating' %}">
+            <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
+            <input type="number" id="nota" name="nota">
+            <input type="submit" value="Rating!">
+        </form>
     </div>
 </body>
 </html>

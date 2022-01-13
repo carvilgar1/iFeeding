@@ -12,7 +12,10 @@
         </li>
         {% if  user.is_authenticated %}
         <li class="nav-item active">
-          <a class="nav-link" href="{% url 'my_ratings' %}">My Ratings <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="{% url 'user_ratings' %}">My Ratings <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'user_daily_plan' %}">My Plans <span class="sr-only">(current)</span></a>
         </li>
         {% endif %}
         <li class="nav-item dropdown">

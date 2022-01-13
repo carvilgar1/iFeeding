@@ -18,3 +18,9 @@ class Plan(models.Model):
 
     def get_amount_of_fats(self) -> int:
         return sum([recipe.grasas for recipe in self.recetas.all()])
+    
+    def get_energy_summary(self):
+        return {'cal': self.get_amount_of_calories(), 
+                'protein': self.get_amount_of_proteins(), 
+                'carbs': self.get_amount_of_carbs(), 
+                'fats': self.get_amount_of_fats()}

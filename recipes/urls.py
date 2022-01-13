@@ -4,5 +4,4 @@ import recipes.views
 urlpatterns = [
     path('search/', recipes.views.recipe_search, name='recipe_search'),
     path('details/<path:url>/', recipes.views.get_by_href, name='get_by_href'),
-    path("my_ratings/", recipes.views.my_ratings, name="my_ratings")
 ]

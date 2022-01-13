@@ -1,4 +1,8 @@
 import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'iFeeding.settings')
+
+import django
+django.setup()
 
 import time
 
@@ -59,7 +63,7 @@ def init_index():
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 5000:
+                if i == 20:
                     break
                 url = recipe.text
                 try:

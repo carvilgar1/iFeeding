@@ -1,0 +1,24 @@
+{% extends 'master.html' %}
+{% block  content %}
+<table>
+    <tr>
+      <th>Energy (kcal)</th>
+      <th>Proteins (grams)</th>
+      <th>Carbs (grams)</th>
+      <th>Fats (grams)</th>
+    </tr>
+    <tr>
+      <td>{{energy.cal}}</td>
+      <td>{{energy.protein}}</td>
+      <td>{{energy.carbs}}</td>
+      <td>{{energy.fats}}</td>
+    </tr>
+  </table> 
+  {% if message %}
+    {{message}}
+  {% else %}
+    {% for recipe in planrecipes %}
+      <div>{{recipe.url}}</div>
+    {% endfor %}
+  {% endif %}
+{% endblock  %}
