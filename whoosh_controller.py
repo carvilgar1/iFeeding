@@ -9,13 +9,12 @@ import http.client
 from urllib.error import HTTPError
 
 import re
-from bs4.element import Tag
 
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
 
 from django.contrib.auth.models import User
-from app.models import Tag, Receta, Puntuacion
+from recipes.models import Tag, Receta, Puntuacion
 
 IX_PATH = './indice/'
 
@@ -100,7 +99,6 @@ def init_index():
                     proteinas=round(float(energy[1]), 2)
                     carbohidratos=round(float(energy[2]), 2)
                     grasas=round(float(energy[3]), 2)
-                    print(url, tag, calorias, proteinas, carbohidratos, grasas, len(valoraciones))
                     receta = Receta.objects.create(url=url, tag=tag[0], calorias=calorias, proteinas=proteinas, carbohidratos=carbohidratos, grasas=grasas)
                     
                 

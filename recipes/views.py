@@ -6,7 +6,7 @@ from whoosh.query.terms import Term
 from whoosh_controller import SCHEMA, IX
 from whoosh.qparser import MultifieldParser, QueryParser
 
-from app.models import Tag, Puntuacion
+from .models import Tag, Puntuacion
 
 TAG_LIST = Tag.objects.all()
 
