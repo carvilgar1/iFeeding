@@ -1,0 +1,22 @@
+.recipe-container{
+    margin-top: 0px;
+    background-color: gainsboro;
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.recipe{
+    width: 20%;
+    text-align: center;
+}
+
+.item{
+    margin-top: 0px;
+    background-color: gainsboro;
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.error-template {padding: 40px 15px;text-align: center;}
+.error-actions {margin-top:15px;margin-bottom:15px;}
+.error-actions .btn { margin-right:10px; }

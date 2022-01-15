@@ -1,0 +1,17 @@
+{% extends 'master.html' %}
+
+{% load static %}
+{% block  content %}
+    <div class="container">
+        {% for recipe in recommended %}
+        <div class="item">
+            <img src="{{recipe.0.img}}" width="150"></img>
+            <div>
+                <a href="{% url 'get_by_href' url=recipe.0.url %}">{{recipe.0.title}}</a>
+                <h2>{{recipe.0.tag}}</h2>
+                <h2>Score: {{recipe.1}}</h2>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}
