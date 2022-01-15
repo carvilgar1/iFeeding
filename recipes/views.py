@@ -8,7 +8,7 @@ from whoosh.qparser import MultifieldParser, QueryParser
 
 import recipes.recommendations as sr
 
-from .models import Tag
+from .models import Tag, Puntuacion
 
 TAG_LIST = Tag.objects.all()
 
@@ -51,8 +51,10 @@ def recommended_recipes(request, num_recommendations):
     if not request.user.is_authenticated:
         return render(request, '404.html', status=404)
     user_id = request.user.id
-    recommended = sr.recommended_recipes(user_id)[:num_recommendations]
-    
+    if len(Puntuacion.objects.filter(usuario_id = user_id)) > 0:
+        recommended = sr.recommended_recipes(user_id)[:num_recommendations]
+    else:
+        recommended = []
     return render(request, 'recommendations.html', {'recommended':recommended})
 
 
