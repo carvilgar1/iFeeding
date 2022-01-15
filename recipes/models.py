@@ -10,7 +10,9 @@ class Tag(models.Model):
         return self.nombre
 
 class Receta(models.Model):
-    url = models.URLField(max_length=300, primary_key=True)
+    url = models.URLField(max_length=500, primary_key=True)
+    img = models.URLField(max_length=500, default="/static/images/no_image_available.jpg")
+    title = models.CharField(max_length=100, default="")
     calorias = models.DecimalField(decimal_places=2, max_digits=5, default=0)
     proteinas = models.DecimalField(decimal_places=2, max_digits=5, default=0)
     grasas = models.DecimalField(decimal_places=2, max_digits=5, default=0)

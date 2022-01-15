@@ -33,9 +33,9 @@
         {% endif %}
     </form>
     <script type="text/javascript" src="{% static "js/pagination.js" %}"></script>
-    <div class="container">
+    <div class="recipe-container">
         {% for recipe in recipes %}
-        <div>
+        <div class="recipe">
             <a href="{% url 'get_by_href' url=recipe.href %}"><img src="{{recipe.image}}" width="150"></img></a>
             <h2>{{recipe.title}}</h2>
         </div>

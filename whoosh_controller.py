@@ -19,6 +19,7 @@ from whoosh.fields import Schema, TEXT, ID, KEYWORD
 
 from django.contrib.auth.models import User
 from recipes.models import Tag, Receta, Puntuacion
+from app.models import Plan
 
 IX_PATH = './indice/'
 
@@ -97,24 +98,23 @@ def init_index():
                     w.add_document(href=url, image=image, title = title, category=category, summary=summary, ingredients = ingredients_list, directions=directions_list, nutrition=nutrition)
                     
                     #Insert review's data into django database
-                    tag = Tag.objects.get_or_create(nombre = category)
+                    tag, created = Tag.objects.get_or_create(nombre = category)
                     energy = re.findall(r'(\d+(?:\.\d+)?)', nutrition)
                     calorias=round(float(energy[0]), 2)
                     proteinas=round(float(energy[1]), 2)
                     carbohidratos=round(float(energy[2]), 2)
                     grasas=round(float(energy[3]), 2)
-                    receta = Receta.objects.create(url=url, tag=tag[0], calorias=calorias, proteinas=proteinas, carbohidratos=carbohidratos, grasas=grasas)
-                    
+                    receta = Receta.objects.create(url=url, title=title, img=image, tag=tag, calorias=calorias, proteinas=proteinas, carbohidratos=carbohidratos, grasas=grasas)
                 
                     for valoracion in valoraciones:
                         try:
                             user = str(valoracion.find('span', {'class' : "reviewer-name"}).string)
                             rating = str(valoracion.find('span', {'class' : "review-star-text"}).string)
                             nota = int(re.search(r"[0-5]", rating).group())
-                            usuario, created = User.objects.get_or_create(username=user, password='S3cr3tP4$$w0rd')
-                            '''if created:
-                                usuario.set_password('S3cr3tP4$$w0rd')
-                                usuario.save()'''
+                            usuario, created = User.objects.get_or_create(username=user)
+                            if created:
+                                usuario.set_password('default')
+                                usuario.save()
                             Puntuacion.objects.create(receta=receta, usuario=usuario, nota=nota)
                         except:
                             #recipes with no ratings will raise a execption just skip it.
@@ -134,12 +134,24 @@ def init_index():
     os.system('clear')
     print(f'{i} recipes has been loaded in {h:d}h:{m:02d}m:{s:02d}s.')
 
+def deleteTables():
+    print("Deleting tables")
+    User.objects.all().delete()
+    Receta.objects.all().delete()
+    Tag.objects.all().delete()
+    Puntuacion.objects.all().delete()
+    Plan.objects.all().delete()
+
+def populate():
+    deleteTables()
+    global IX
+    IX = create_in(IX_PATH, SCHEMA)
+    init_index()
+
 def main():
     option = input("This process will delete and rewrite the index. Do you want to continue? Y/n ")
     if option == 'Y':
-        global IX
-        IX = create_in(IX_PATH, SCHEMA)
-        init_index()
+        populate()
     
 
 if __name__ == '__main__':

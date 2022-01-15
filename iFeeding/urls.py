@@ -20,6 +20,8 @@ import app.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('populate/', app.views.populate_db, name="populate"),
+    path('init_rs/', app.views.init_rs, name="init_rs"),
     path('', app.views.welcome, name='welcome'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/register/', app.views.register, name='register'),

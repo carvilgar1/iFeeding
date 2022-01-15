@@ -5,6 +5,9 @@ from whoosh.query.terms import Term
 from whoosh_controller import SCHEMA, IX
 from whoosh.qparser import MultifieldParser, QueryParser
 
+
+import recipes.recommendations as sr
+
 from .models import Tag
 
 TAG_LIST = Tag.objects.all()
@@ -43,4 +46,14 @@ def get_by_href(request, url):
 
         html = render(request, 'recipe_info.html', context)
     return html
+
+def recommended_recipes(request, num_recommendations):
+    if not request.user.is_authenticated:
+        return render(request, '404.html', status=404)
+    user_id = request.user.id
+    recommended = sr.recommended_recipes(user_id)[:num_recommendations]
+    
+    return render(request, 'recommendations.html', {'recommended':recommended})
+
+
 
