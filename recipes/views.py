@@ -39,6 +39,9 @@ def recipe_search(request):
             filter = And([Term('category',request.GET['tag'])])
         else:
             filter = None
+
+        if not request.GET['query'] and request.GET['tag']:
+            my_query = And([Term('category',request.GET['tag'])])
         
         results = s.search_page(my_query, 
                                 filter= filter, 

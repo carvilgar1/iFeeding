@@ -41,16 +41,16 @@ if not os.path.exists(IX_PATH):
 else:
     IX = open_dir(IX_PATH)
 
-def init_index():
+def init_index(limit=100):
     '''
     This function scrapes data from www.allrecipes.com and insert them into whoosh engine.
     '''
-    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/1/sitemap.xml') 
+    pattern = re.compile(r'https://www.allrecipes.com/sitemaps/recipe/[\d]+/sitemap.xml') 
 
     sitemap_web = urllib.request.urlopen(url='https://www.allrecipes.com/sitemap.xml').read()
     sitemap_soup = BeautifulSoup(sitemap_web, 'lxml')
     start = time.time()
-    i = 1
+    i = 0
     with IX.writer() as w:
         '''
         First, function crawls URLs from sitemap.xml.
@@ -64,8 +64,9 @@ def init_index():
             sitemap_recipe_web = urllib.request.urlopen(url=loc.text).read()
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
+            j = 0
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 30:
+                if j == limit:
                     break
                 url = recipe.text
                 try:
@@ -129,6 +130,7 @@ def init_index():
                 animation = '.' * (i%4)
                 print(f'Loading data{animation:3s} {i}/{total_data}| Load time: {h:d}h:{m:02d}m:{s:02d}s.', end='\r')
                 i = i+1
+                j = j+1
     finish_time = time.time()
     m, s = divmod(int(finish_time - start), 60)
     h, m = divmod(m, 60)

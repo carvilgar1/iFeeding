@@ -3,6 +3,9 @@
 {% load static %}
 {% block  content %}
     <div class="container">
+        <h1 style="text-align:center;">
+            Recommendations
+        </h1>
         {% for recipe in recommended %}
         <div class="row rating-bg">
             <img class="rating-img" src="{{recipe.0.img}}"></img>
