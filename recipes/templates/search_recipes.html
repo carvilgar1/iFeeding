@@ -21,20 +21,29 @@
                         <option value="{{tag}}" {% ifequal request.GET.tag tag.nombre %} selected {% endifequal %}>{{tag}}</option>
                     {% endfor %}
                 </select>
-                <br>
-                <input id="page_num" type="hidden" name="page_num">
-                <div>
-                    <nav aria-label="Page navigation example">
-                        <ul class="pagination">
-                          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                          <li class="page-item"><a class="page-link" href="#" onclick="document.getElementById('my_form').submit();">1</a></li>
-                          <li class="page-item"><a class="page-link" href="#">2</a></li>
-                          <li class="page-item"><a class="page-link" href="#">3</a></li>
-                          <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                        </ul>
-                      </nav>
-                </div>
             </form>
+            <div>
+                <!--Pagination item with javascript-->
+                <nav aria-label="...">
+                        <ul class="pagination">
+                        <li class="page-item {% if request.GET.page_num == '1' %}disabled{% endif %}">
+                        <a class="page-link" href="#" onClick="addPageNumToFormAndSend({{prev}})" onc tabindex="-1">Previous</a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link" onclick="addPageNumToFormAndSend({{request.GET.page_num}})">{{request.GET.page_num}}</a>
+                        </li>
+                        <li class="page-item">
+                        <a class="page-link" href="#" onClick="addPageNumToFormAndSend({{next}})">{{next}}</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="#" onClick="addPageNumToFormAndSend({{next2}})">{{next2}}</a>
+                        </li>
+                        <li class="page-item">
+                        <a class="page-link" href="#" onClick="addPageNumToFormAndSend({{next}})">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
             <script type="text/javascript" src="{% static "js/pagination.js" %}"></script>
         </div>
         <div class="col-md-9 col-sm-12 col-12">  

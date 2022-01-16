@@ -34,6 +34,8 @@ def recipe_search(request):
                                 pagelen=pagelen)
         context['recipes'] = results
         context['result_len'] = len(results)
+
+        context.update({"prev":pagenum-1, "next":pagenum+1, "next2":pagenum+2})
        
         html = render(request, 'search_recipes.html', context)
     return html

@@ -1,17 +1,13 @@
-var total_len = document.getElementById("result_len").innerHTML;
-var page_num = document.getElementById("page_num");
-var page_len = document.getElementById("page_len"); 
+function addPageNumToFormAndSend(pageNum){
+    var input = document.createElement("input");
 
-if (page_num.value < 1){
-    page_num.value = 1;
-}
+    input.setAttribute("type", "hidden");
 
-if (page_len.value < 1){
-    page_len.value = 15;
-}
+    input.setAttribute("name", "page_num");
 
-var total_pages = Math.ceil(total_len/page_len.value)
+    input.setAttribute("value", pageNum);
 
-if(page_num.value > total_pages){
-    page_num.value = total_pages;
+    //append to form element that you want .
+    document.getElementById("extended_search_form").appendChild(input);
+    document.getElementById("extended_search_form").submit();
 }
