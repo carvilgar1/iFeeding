@@ -8,12 +8,16 @@
                 <img class="info-img" src="{{image}}"></img>
                 <h2>Tag: {{category}}</h2>
                 <a href="{{href}}">See on original page</a>
+                <div class="row">
                 <form method="GET" action="{% url 'add_recipe_to_daily_plan' %}">
                     <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
                     <input type="submit" class="btn btn-outline-success" value="Add it to your daily plan!">
-                </form><br>
+                </form>
+                </div>
+                <div class="row">
                 <form method="GET" action="{% url 'add_rating' %}">
                     <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
+                    <div class="row">
                     <select class="form-control" id="nota">
                         <option>1</option>
                         <option>2</option>
@@ -22,7 +26,9 @@
                         <option>5</option>
                     </select>
                     <input type="submit" class="btn btn-outline-success" value="Rating!">
+                    </div>
                 </form>
+                </div>
             </div>
             <div class="col-md-8 col-sm-12 col-12">  
                 <h1>{{title}}</h1>

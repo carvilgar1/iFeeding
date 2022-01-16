@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
 
 from django.contrib.auth.models import User
 from .models import Plan
@@ -21,19 +21,19 @@ def login(request):
 
 def user_ratings(request):
     if not request.user.is_authenticated:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     user_ratings = User.objects.get(pk = request.user.id).puntuacion_set.all()
     return render(request, 'ratings.html', {'ratings':user_ratings})
 
 def add_rating(request):
     if not request.user.is_authenticated:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     Puntuacion.objects.create(usuario_id = request.user.id, receta_id = request.GET['recipe_url'], nota = request.GET['nota'])  
     return HttpResponseRedirect('/')
 
 def user_daily_plan(request):
     if not request.user.is_authenticated:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     try:
         user_plan = User.objects.get(pk = request.user.id).plan_set.get(dia = date.today())
         energy = user_plan.get_energy_summary()
@@ -48,7 +48,7 @@ def user_daily_plan(request):
 
 def add_recipe_to_plan(request):
     if not request.user.is_authenticated:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     user_plans, _ = Plan.objects.get_or_create(usuario_id = request.user.id, dia = date.today())
     receta = get_object_or_404(Receta, pk=request.GET['recipe_url'])
     user_plans.recetas.add(receta)
@@ -73,12 +73,12 @@ def register(request):
 
 def populate_db(request):
     if not request.user.is_superuser:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     populate()
     return HttpResponseRedirect('/')
 
 def init_rs(request):
     if not request.user.is_superuser:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     load_similarities()
     return HttpResponseRedirect('/')

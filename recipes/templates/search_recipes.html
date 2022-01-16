@@ -2,54 +2,66 @@
 
 {% load static %}
 {% block  content %}
-    <link rel="stylesheet" href="{% static 'styles/search.css' %}">
-    <h1>Search results: {{request.GET.query}}</h1>
-    <h2><span id="result_len">{{result_len}}</span> has been found</h2>
-    <form action="{% url 'recipe_search' %}" method="get" id="my_form">
-        <input id="query" type="hidden" name="query" value="{{request.GET.query}}">
-        <label for="your_name">Your ingredients here: </label>
-        <input id="ingredients_to_include" type="text" name="ingredients_to_include" value="{{request.GET.ingredients_to_include}}"><br>
-
-        <label for="your_name">Your ingredients to exclude here: </label>
-        <input id="ingredients_to_exclude" type="text" name="ingredients_to_exclude" value="{{request.GET.ingredients_to_exclude}}"><br>
-
-        <label for="tag">tag</label>
-        <select id="tag" name="tag">
-            <option value="">---</option>
-            {% for tag in tags%}
-                <option value="{{tag}}" {% ifequal request.GET.tag tag.nombre %} selected {% endifequal %}>{{tag}}</option>
-            {% endfor %}
-        </select>
-        <br>
-        <input id="page_num" type="number" name="page_num" value="{{request.GET.page_num}}"><br>
-        <input id="page_len" type="number" name="page_len" min="15" max="30" step="5" value="{{request.GET.page_len}}">
-        <input type="submit" value="Submit">
-        <div>
-            <nav aria-label="Page navigation example">
-                <ul class="pagination">
-                  <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                  <li class="page-item"><a class="page-link" href="#" onclick="document.getElementById('my_form').submit();">1</a></li>
-                  <li class="page-item"><a class="page-link" href="#">2</a></li>
-                  <li class="page-item"><a class="page-link" href="#">3</a></li>
-                  <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                </ul>
-              </nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="info-aside col-md-3 col-sm-12 col-12">
+            <form action="{% url 'recipe_search' %}" method="get" id="extended_search_form">
+                <label for="query">Your query here: </label>
+                <input class="form-control" id="query" name="query" value="{{request.GET.query}}"/>
+                <label for="ingredients_to_include">Your ingredients here: </label>
+                <textarea class="form-control" id="ingredients_to_include" name="ingredients_to_include" form="extended_search_form" rows="3">{{request.GET.ingredients_to_include}}</textarea>
+        
+                <label for="ingredients_to_exclude">Your ingredients to exclude here: </label>
+                <textarea class="form-control" id="ingredients_to_exclude" name="ingredients_to_exclude" form="extended_search_form" rows="3">{{request.GET.ingredients_to_exclude}}</textarea>
+        
+                <label for="tag">Tag to filter here:</label>
+                <select class="form-control" id="tag" name="tag">
+                    <option value="">---</option>
+                    {% for tag in tags%}
+                        <option value="{{tag}}" {% ifequal request.GET.tag tag.nombre %} selected {% endifequal %}>{{tag}}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <input id="page_num" type="hidden" name="page_num">
+                <div>
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                          <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                          <li class="page-item"><a class="page-link" href="#" onclick="document.getElementById('my_form').submit();">1</a></li>
+                          <li class="page-item"><a class="page-link" href="#">2</a></li>
+                          <li class="page-item"><a class="page-link" href="#">3</a></li>
+                          <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                      </nav>
+                </div>
+            </form>
+            <script type="text/javascript" src="{% static "js/pagination.js" %}"></script>
         </div>
-        {% if errors%}
-            {% for error in errors%}
+        <div class="col-md-9 col-sm-12 col-12">  
             <div>
-                <p>{{error}}</p>
+                <div class="container">
+                    <h1>Search results: {{request.GET.query}}</h1>
+                </div>
+                <div class="row">
+                    <div class="recipe-found">
+                        <h2><span id="result_len">{{result_len}}</span> recipes has been found</h2>
+                    </div>
+                    <div class="recipe-page-len">
+                        <label for="page_len">Page len</label>
+                        <input id="page_len" type="number" name="page_len" min="15" max="30" step="5" form="extended_search_form" value="{{request.GET.page_len}}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recipe-container">
+            {% for recipe in recipes %}
+            <div class="recipe">
+                <a href="{% url 'get_by_href' url=recipe.href %}"><img src="{{recipe.image}}" width="150"></img></a>
+                <h2>{{recipe.title}}</h2>
             </div>
             {% endfor %}
-        {% endif %}
-    </form>
-    <script type="text/javascript" src="{% static "js/pagination.js" %}"></script>
-    <div class="recipe-container">
-        {% for recipe in recipes %}
-        <div class="recipe">
-            <a href="{% url 'get_by_href' url=recipe.href %}"><img src="{{recipe.image}}" width="150"></img></a>
-            <h2>{{recipe.title}}</h2>
+            </div>
         </div>
-        {% endfor %}
     </div>
+</div>
 {% endblock %}

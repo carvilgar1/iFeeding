@@ -50,13 +50,16 @@ def get_by_href(request, url):
 
 def recommended_recipes(request, num_recommendations):
     if not request.user.is_authenticated:
-        return render(request, '404.html', status=404)
+        return render(request, 'errors/404.html', status=404)
     user_id = request.user.id
-    if len(Puntuacion.objects.filter(usuario_id = user_id)) > 0:
-        recommended = sr.recommended_recipes(user_id)[:num_recommendations]
-    else:
-        recommended = []
-    return render(request, 'recommendations.html', {'recommended':recommended})
+    try:
+        if len(Puntuacion.objects.filter(usuario_id = user_id)) > 0:
+            recommended = sr.recommended_recipes(user_id)[:num_recommendations]
+        else:
+            recommended = []
+        return render(request, 'recommendations.html', {'recommended':recommended})
+    except:
+        return render(request, 'errors/500.html', status=500)
 
 
 

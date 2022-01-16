@@ -1,8 +1,8 @@
 .recipe-container{
     margin-top: 0px;
-    background-color: gainsboro;
     display: inline-flex;
     flex-wrap: wrap;
+    height: 100%;
 }
 
 .recipe{
@@ -21,8 +21,24 @@
 .error-actions {margin-top:15px;margin-bottom:15px;}
 .error-actions .btn { margin-right:10px; }
 
+.recipe-found{
+    padding: 15px;
+    margin: 0;
+    border: 0;
+    width: 50%;
+}
+
+.recipe-page-len{
+    padding: 15px;
+    margin: 0;
+    border: 0;
+    width: 50%;
+    text-align: right;
+}
+
 .info-aside{
     padding: 2%;
+    height: 100%;
     background-color: #eef5d5;
 }
 
