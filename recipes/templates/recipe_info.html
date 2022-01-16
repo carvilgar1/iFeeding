@@ -1,32 +1,51 @@
+{% extends 'master.html' %}
+
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
-</head>
-<body>
-    <div>
-        <h1>Receta</h1>
-        <img src="{{image}}" width="150"></img>
-        <h2>{{title}}</h2>
-        <h2>{{summary}}</h2>
-        <h2 style="color: red;">{{category}}</h2>
-        <h2>{{ingredients}}</h2>
-        <h2>{{directions}}</h2>
-        <h2>{{nutrition}}</h2>
-        <a href="{{href}}">See on original page</a>
-        <form method="GET" action="{% url 'add_recipe_to_daily_plan' %}">
-            <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
-            <input type="submit" value="Add it to your daily plan!">
-        </form><br>
-        <form method="GET" action="{% url 'add_rating' %}">
-            <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
-            <input type="number" id="nota" name="nota">
-            <input type="submit" value="Rating!">
-        </form>
+{% block  content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="info-aside col-md-4 col-sm-12 col-12">
+                <img class="info-img" src="{{image}}"></img>
+                <h2>Tag: {{category}}</h2>
+                <a href="{{href}}">See on original page</a>
+                <form method="GET" action="{% url 'add_recipe_to_daily_plan' %}">
+                    <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
+                    <input type="submit" class="btn btn-outline-success" value="Add it to your daily plan!">
+                </form><br>
+                <form method="GET" action="{% url 'add_rating' %}">
+                    <input type="hidden" id="recipe_url" name="recipe_url" value="{{href}}">
+                    <select class="form-control" id="nota">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                    <input type="submit" class="btn btn-outline-success" value="Rating!">
+                </form>
+            </div>
+            <div class="col-md-8 col-sm-12 col-12">  
+                <h1>{{title}}</h1>
+                <section>
+                    <h2>{{summary}}</h2>
+                </section>
+                <section>
+                    <h2>Ingredients</h2>
+                    {% for ingredient in ingredients %}
+                    <h3>{{ingredient}}</h3>
+                    {% endfor %}
+                </section>
+                <section>
+                    <h2>Directions</h2>
+                    {% for direction in directions %}
+                    <h3>{{direction}}</h3>
+                    {% endfor %}
+                </section>
+                <section>
+                    <h2>Nutritional Facts</h2>
+                    <h3>{{nutrition}}</h3>
+                </section>
+            </div>
+        </div>
     </div>
-</body>
-</html>
+{% endblock %}

@@ -43,7 +43,8 @@ def get_by_href(request, url):
         recipe = s.document(href=url)
 
         context = dict(recipe)
-
+        context['ingredients'] = context['ingredients'].split('\n')
+        context['directions'] = context['directions'].split('\n\n')
         html = render(request, 'recipe_info.html', context)
     return html
 
