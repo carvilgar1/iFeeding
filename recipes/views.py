@@ -3,7 +3,9 @@ from whoosh.query.compound import Or, And
 
 from whoosh.query.terms import Term
 from whoosh_controller import SCHEMA, IX
-from whoosh.qparser import MultifieldParser, QueryParser
+from whoosh.qparser import MultifieldParser
+from whoosh.analysis import LanguageAnalyzer
+from whoosh.query import Query
 
 
 import recipes.recommendations as sr
@@ -20,16 +22,27 @@ def recipe_search(request):
     if pagenum < 1 or pagelen < 1:
         pagenum = 1
         pagelen = 15
-        context['errors'] = ["Page len must be greater than 14", "page num must be greater than 0"]
+    
     with IX.searcher() as s:
+        tokenizer = LanguageAnalyzer("en")
+        my_query_tokenized = " ".join([word.text for word in tokenizer(request.GET['query'])]) 
         parser = MultifieldParser(['summary', 'title'], SCHEMA)
-        my_query = parser.parse(request.GET['query'])
+        my_query = parser.parse(my_query_tokenized)
         ingredients_to_include = Or([Term('ingredients', ingredient) for ingredient in request.GET['ingredients_to_include'].split(" ")]) if request.GET['ingredients_to_include'] else None
         ingredients_to_exclude = And([Term('ingredients', ingredient) for ingredient in request.GET['ingredients_to_exclude'].split(" ")])if request.GET['ingredients_to_exclude'] else None
         #If ingredients_to_include or ingredients_to_exclude are settled but empty then set their values to None to not filter the results
+        if request.GET['tag'] and ingredients_to_include != None: 
+            filter= And([Term('category',request.GET['tag']), ingredients_to_include])
+        elif not request.GET['tag'] and ingredients_to_include != None: 
+            filter = ingredients_to_include
+        elif request.GET['tag'] and ingredients_to_include == None: 
+            filter = And([Term('category',request.GET['tag'])])
+        else:
+            filter = None
+        
         results = s.search_page(my_query, 
-                                filter= ingredients_to_include, 
-                                mask= ingredients_to_exclude, 
+                                filter= filter, 
+                                mask= ingredients_to_exclude,
                                 pagenum=pagenum, 
                                 pagelen=pagelen)
         context['recipes'] = results

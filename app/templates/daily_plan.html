@@ -1,24 +1,73 @@
 {% extends 'master.html' %}
 {% block  content %}
-<table>
-    <tr>
-      <th>Energy (kcal)</th>
-      <th>Proteins (grams)</th>
-      <th>Carbs (grams)</th>
-      <th>Fats (grams)</th>
-    </tr>
-    <tr>
-      <td>{{energy.cal}}</td>
-      <td>{{energy.protein}}</td>
-      <td>{{energy.carbs}}</td>
-      <td>{{energy.fats}}</td>
-    </tr>
-  </table> 
+<div class="container">
+     
+  <h1 style="text-align:center;">
+      {% now "jS F Y" %} Plan
+  </h1>
+
+  <!-- Bootstrap table class -->
+  <table class="table">
+      <thead>
+          <tr>
+              <th scope="col">Energy (kcal)</th>
+              <th scope="col">Proteins (grams)</th>
+              <th scope="col">Carbs (grams)</th>
+              <th scope="col">Fats (grams)</th>
+          </tr>
+      </thead>
+       
+      <tbody>
+          <tr>
+              <td>{{energy.cal}}</td>
+              <td>{{energy.protein}}</td>
+              <td>{{energy.carbs}}</td>
+              <td>{{energy.fats}}</td>
+          </tr>
+      </tbody>
+  </table>
   {% if message %}
     {{message}}
   {% else %}
+    <h1>
+      Added Recipes
+    </h1>
     {% for recipe in planrecipes %}
-      <div>{{recipe.url}}</div>
+      <div class="row rating-bg">
+        <img class="rating-img" src="{{recipe.img}}"></img>
+        <div class="plan-text">
+            <a href="{% url 'get_by_href' url=recipe.url %}">{{recipe.title}}</a>
+            <h2>{{recipe.tag}}</h2>
+        </div>
+        <div class="energy-plan">
+          <h3>
+            Nutritional facts
+          </h3>
+          <table>
+            <thead>
+                <tr>
+                    <th scope="col">Energy (kcal)</th>
+                    <th scope="col">Proteins (grams)</th>
+                    <th scope="col">Carbs (grams)</th>
+                    <th scope="col">Fats (grams)</th>
+                </tr>
+            </thead>
+            
+            <tbody>
+                <tr>
+                    <td>{{recipe.calorias}}</td>
+                    <td>{{recipe.proteinas}}</td>
+                    <td>{{recipe.carbohidratos}}</td>
+                    <td>{{recipe.grasas}}</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </div>
     {% endfor %}
   {% endif %}
+</div>
+  
 {% endblock  %}
+
+

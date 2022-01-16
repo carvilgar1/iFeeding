@@ -9,10 +9,10 @@
                 <label for="query">Your query here: </label>
                 <input class="form-control" id="query" name="query" value="{{request.GET.query}}"/>
                 <label for="ingredients_to_include">Your ingredients here: </label>
-                <textarea class="form-control" id="ingredients_to_include" name="ingredients_to_include" form="extended_search_form" rows="3">{{request.GET.ingredients_to_include}}</textarea>
+                <input class="form-control" id="ingredients_to_include" name="ingredients_to_include" value="{{request.GET.ingredients_to_include}}">
         
                 <label for="ingredients_to_exclude">Your ingredients to exclude here: </label>
-                <textarea class="form-control" id="ingredients_to_exclude" name="ingredients_to_exclude" form="extended_search_form" rows="3">{{request.GET.ingredients_to_exclude}}</textarea>
+                <input class="form-control" id="ingredients_to_exclude" name="ingredients_to_exclude" value="{{request.GET.ingredients_to_exclude}}">
         
                 <label for="tag">Tag to filter here:</label>
                 <select class="form-control" id="tag" name="tag">
@@ -21,6 +21,8 @@
                         <option value="{{tag}}" {% ifequal request.GET.tag tag.nombre %} selected {% endifequal %}>{{tag}}</option>
                     {% endfor %}
                 </select>
+                <input type="hidden" id="page_num" name="page_num" value="1">
+                <input class="btn btn-outline-success" type="submit" onclick="addPageNumToFormAndSend(1)" value="Search!">
             </form>
             <div>
                 <!--Pagination item with javascript-->

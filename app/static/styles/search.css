@@ -45,3 +45,34 @@
 .info-img{
     width: 100%;
 }
+
+.rating-text{
+    text-align: center;
+    padding: 15px;
+    width: 73%;
+}
+
+.rating-img{
+    width: 14%;
+}
+
+.rating-rating{
+    text-align: center;
+    width: 13%;
+}
+
+.rating-bg{
+    margin: 15px;
+    background-color: #eef5d5;
+}
+
+.plan-text{
+    text-align: center;
+    padding: 15px;
+    width: 43%;
+}
+
+.energy-plan{
+    text-align: center;
+    width: 43%;
+}

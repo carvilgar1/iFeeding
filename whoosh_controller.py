@@ -16,6 +16,7 @@ import re
 
 from whoosh.index import create_in, open_dir
 from whoosh.fields import Schema, TEXT, ID, KEYWORD
+from whoosh.analysis import LanguageAnalyzer
 
 from django.contrib.auth.models import User
 from recipes.models import Tag, Receta, Puntuacion
@@ -26,8 +27,8 @@ IX_PATH = './indice/'
 SCHEMA = Schema(
             href = ID(stored=True, unique=True),
             image = ID(stored=True),
-            title = TEXT(stored = True),
-            summary=TEXT(stored=True),
+            title = TEXT(stored = True, analyzer=LanguageAnalyzer("en")),
+            summary=TEXT(stored=True, analyzer=LanguageAnalyzer("en")),
             category=KEYWORD(stored=True, commas=True),
             ingredients=TEXT(stored=True),
             directions=TEXT(stored=True),
@@ -64,7 +65,7 @@ def init_index():
             sitemap_recipe_soup = BeautifulSoup(sitemap_recipe_web,  'lxml')
             total_data = len(sitemap_recipe_soup.find_all('loc'))
             for recipe in sitemap_recipe_soup.find_all('loc'):
-                if i == 20:
+                if i == 30:
                     break
                 url = recipe.text
                 try:
@@ -111,10 +112,10 @@ def init_index():
                             user = str(valoracion.find('span', {'class' : "reviewer-name"}).string)
                             rating = str(valoracion.find('span', {'class' : "review-star-text"}).string)
                             nota = int(re.search(r"[0-5]", rating).group())
-                            usuario, created = User.objects.get_or_create(username=user)
-                            if created:
-                                usuario.set_password('default')
-                                usuario.save()
+                            usuario, created = User.objects.get_or_create(username=user, password='default')
+                            # if created:
+                            #     usuario.set_password('default')
+                            #     usuario.save()
                             Puntuacion.objects.create(receta=receta, usuario=usuario, nota=nota)
                         except:
                             #recipes with no ratings will raise a execption just skip it.
